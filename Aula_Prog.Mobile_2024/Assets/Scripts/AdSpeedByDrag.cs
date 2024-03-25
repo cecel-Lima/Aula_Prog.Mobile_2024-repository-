@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class AdSpeedByDrag : MonoBehaviour
@@ -7,23 +8,24 @@ public class AdSpeedByDrag : MonoBehaviour
     //Main Caracter Script
 
     Touch finger;
-    Vector3 beganPos;
-    Vector3 fingerPos;
+    Vector2 beganPos;
+    Vector2 fingerPos;
     public int speedMarks = 0;
+    int launchMark;
     [SerializeField]
     float speed;
     bool incremented = false;
     Rigidbody2D rb;
-    [SerializeField]
     bool touchGrass;
     [SerializeField]
     float pVStrenght;
     float stayTime = 0f;
+    public TextMeshProUGUI textSpeed;
 
     // Start is called before the first frame update
     void Start()
     {
-        rb = this.gameObject.GetComponent<Rigidbody2D>();
+        rb = gameObject.GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
@@ -35,9 +37,9 @@ public class AdSpeedByDrag : MonoBehaviour
 
             if (finger.phase == TouchPhase.Began )
             {
-                beganPos = Camera.main.ScreenToWorldPoint(finger.position);
+                beganPos = finger.position;
             }
-            fingerPos = Camera.main.ScreenToWorldPoint(finger.position);
+            fingerPos = finger.position;
 
             DirectionInput();
 
@@ -48,6 +50,7 @@ public class AdSpeedByDrag : MonoBehaviour
                 {
                     PoleVault();
                 }
+
             }
             else
             {
@@ -60,17 +63,27 @@ public class AdSpeedByDrag : MonoBehaviour
             DirectionInput();
         }
         DirectionAndSpeed();
+        textSpeed.text = "Speed: " + speedMarks.ToString();
     }
 
     void DirectionAndSpeed()
     {
         Vector3 pos = transform.position;
-        pos.x += speed * speedMarks * Time.deltaTime;
-        if (touchGrass) { transform.position = pos; }
+        if (touchGrass) 
+        {
+            pos.x += speed * speedMarks * Time.deltaTime;
+            transform.position = pos;
+        }
+        else
+        {
+            pos.x += speed * launchMark * Time.deltaTime;
+            transform.position = pos;
+        }
     }
 
     void DirectionInput()
     {
+        //swipe finger right
         if (beganPos.x < fingerPos.x && !incremented)
         {
             incremented = true;
@@ -79,6 +92,7 @@ public class AdSpeedByDrag : MonoBehaviour
             if (speedMarks >= -3 && speedMarks < 0) {  speedMarks = 0; }
         }
 
+        //sripe finger left
         if(beganPos.x > fingerPos.x && !incremented)
         {
             incremented = true;
@@ -98,7 +112,7 @@ public class AdSpeedByDrag : MonoBehaviour
         if (collision.gameObject.CompareTag("Surface"))
         {
             touchGrass = true;
-            if (speedMarks == 0) { rb.velocity = Vector2.zero; }
+            rb.velocity = Vector2.zero;
         }
     }
 
@@ -107,7 +121,8 @@ public class AdSpeedByDrag : MonoBehaviour
         if (touchGrass)
         {
             touchGrass = false;
-            rb.AddForce(new Vector3(speedMarks, 1f, 0f) * pVStrenght);
+            launchMark = speedMarks;
+            rb.AddForce(new Vector2( 0f, 1f) * pVStrenght);
         }
     }
 }
