@@ -20,6 +20,8 @@ public class AdSpeedByDrag : MonoBehaviour
     [SerializeField]
     float pVStrenght;
     float stayTime = 0f;
+    [SerializeField]
+    private float nessStayTime;
     public TextMeshProUGUI textSpeed;
 
     // Start is called before the first frame update
@@ -46,7 +48,7 @@ public class AdSpeedByDrag : MonoBehaviour
             if (finger.phase == TouchPhase.Stationary)
             {
                 stayTime += Time.deltaTime;
-                if (stayTime > 0.1f)
+                if (stayTime > nessStayTime)
                 {
                     PoleVault();
                 }
@@ -84,7 +86,7 @@ public class AdSpeedByDrag : MonoBehaviour
     void DirectionInput()
     {
         //swipe finger right
-        if (beganPos.x < fingerPos.x && !incremented)
+        if (beganPos.x < fingerPos.x && !incremented && touchGrass)
         {
             incremented = true;
             speedMarks++;
@@ -93,7 +95,7 @@ public class AdSpeedByDrag : MonoBehaviour
         }
 
         //sripe finger left
-        if(beganPos.x > fingerPos.x && !incremented)
+        if(beganPos.x > fingerPos.x && !incremented && touchGrass)
         {
             incremented = true;
             speedMarks--;
